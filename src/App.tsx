@@ -7,7 +7,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<AuthPage />} />
-        <Route path="/shop" element={<CalendarPage />} />
+        <Route path="/calendar" element={<CalendarPage />} />
       </Routes>
     </BrowserRouter>
   );
