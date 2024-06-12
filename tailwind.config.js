@@ -9,12 +9,32 @@ export default {
       transparent: "transparent",
       current: "currentColor",
       brand: "#8D7FC7",
-      darkBrand: "#62588b",
+      brandDark: "#62588b",
+      brandLigth: "#EEEEFF",
       black: colors.black,
       white: colors.white,
       gray: colors.gray,
     },
-    extend: {},
+    extend: {
+      backgroundImage: {
+        gift: "url('gift.svg')",
+      },
+    },
   },
   plugins: [daisyui],
+  daisyui: {
+    themes: [
+      {
+        mytheme: {
+          primary: "#8D7FC7",
+          secondary: "#62588b",
+          accent: "#D7F0D6",
+          neutral: "#EEEEFF",
+          "base-100": "#ffffff",
+        },
+      },
+      "dark",
+      "cupcake",
+    ],
+  },
 };
