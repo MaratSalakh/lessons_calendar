@@ -16,7 +16,7 @@ export const CustomMenu = () => {
   const linkClasses = cn("rounded-none", "rounded-e-3xl", "hover:bg-primary");
 
   return (
-    <div className="m-3 flex w-2/12 flex-col gap-3 rounded-3xl bg-neutral pb-5 pr-5 pt-5">
+    <div className="flex flex-col gap-3 rounded-3xl bg-neutral pb-5 pr-5 pt-5">
       <img
         className="self-center"
         src="logoWithTitle.svg"
