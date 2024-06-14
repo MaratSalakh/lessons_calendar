@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.5",
+    "@rehookify/datepicker": "^6.6.1",
     "classnames": "^2.5.1",
     "lucide-react": "^0.394.0",
     "react": "^18.2.0",
