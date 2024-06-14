@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import lessonsSlice from "./lessonsSlice";
+import calendarSlice from "./lessonsSlice";
 
 export const store = configureStore({
   reducer: {
-    lessons: lessonsSlice,
+    calendar: calendarSlice,
   },
 });
 
