@@ -1,5 +1,6 @@
 import { CustomMenu } from "../components/CustomMenu";
 import { CustomNavBar } from "../components/CustomNavBar";
+import { CustomCalendar } from "../components/CustomCalendar";
 
 export const CalendarPage = () => {
   return (
@@ -9,8 +10,13 @@ export const CalendarPage = () => {
           <CustomMenu />
         </div>
       </div>
-      <div className="w-10/12">
-        <CustomNavBar />
+      <div className="dlex w-10/12 flex-col">
+        <div>
+          <CustomNavBar />
+        </div>
+        <div className="ml-3 mt-5">
+          <CustomCalendar></CustomCalendar>
+        </div>
       </div>
     </div>
   );
