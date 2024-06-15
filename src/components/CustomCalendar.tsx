@@ -1,16 +1,37 @@
-import { MoveLeft, MoveRight } from "lucide-react";
+import { MoveLeft, MoveRight, PencilLine, CircleX } from "lucide-react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useDatePicker } from "@rehookify/datepicker";
+
+import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks";
+import {
+  initializeCalendar,
+  setFirstTime,
+  setSecondTime,
+  setChangeMode,
+  setChangingLesson,
+} from "../slices/calendarSlice";
+import type { DateOfCalendar } from "../slices/calendarSlice";
+import classNames from "classnames";
 
 export const CustomCalendar = () => {
   const [selectedDates, onDatesChange] = useState<Date[]>([]);
   const [offsetDate, onOffsetChange] = useState<Date>(new Date());
 
+  const weekDays = [
+    "Понедельник",
+    "Вторник",
+    "Среда",
+    "Четверг",
+    "Пятница",
+    "Суббота",
+    "Воскресенье",
+  ];
+
   const {
-    data: { weekDays, calendars },
-    propGetters: { dayButton, addOffset, subtractOffset },
+    data: { calendars },
+    propGetters: { addOffset, subtractOffset },
   } = useDatePicker({
     selectedDates,
     onDatesChange,
@@ -55,14 +76,69 @@ export const CustomCalendar = () => {
 
   // console.log(formattedDays);
 
+  const dispatch = useAppDispatch();
+  const calendar = useAppSelector((state) => state.calendar.value);
+  const changeMode = useAppSelector((state) => state.calendar.changeMode);
+
+  const formattedDays = days.map((dpday, i) => {
+    return {
+      day: dpday.day,
+      inCurrentMonth: dpday.inCurrentMonth,
+      lessons: {
+        firstTitle: "Ментальная арифметика",
+        firstTime: "13:15 - 13:45",
+        secondTitle: "Ментальная арифметика",
+        secondTime: "-",
+        changing: false,
+        i,
+      },
+    };
+  });
+
+  useEffect(() => {
+    dispatch(initializeCalendar(formattedDays));
+  }, [offsetDate]);
+
   const size = 7; //размер подмассива
-  const mainTable = []; //массив в который будет выведен результат.
-  for (let i = 0; i < Math.ceil(days.length / size); i++) {
-    mainTable[i] = days.slice(i * size, i * size + size);
+  const mainTable: DateOfCalendar[][] = []; //массив в который будет выведен результат.
+  for (let i = 0; i < Math.ceil(calendar.length / size); i++) {
+    mainTable[i] = calendar.slice(i * size, i * size + size);
   }
+
+  const dateNumberClass = (inCurrentMonth: boolean) =>
+    classNames({
+      "text-gray-400": !inCurrentMonth,
+    });
 
   return (
     <section>
+      <div className="flex justify-between">
+        <select className="select select-bordered w-full max-w-xs">
+          <option disabled selected>
+            Выбрать предмет
+          </option>
+          <option>Ментальная арифметика</option>
+          <option>Программирование</option>
+          <option>Скорочтение</option>
+        </select>
+        <div>
+          {changeMode === false ? (
+            <button
+              onClick={() => dispatch(setChangeMode())}
+              className="btn w-full rounded-3xl bg-primary text-white hover:bg-secondary"
+            >
+              Изменить расписание
+            </button>
+          ) : (
+            <button
+              onClick={() => dispatch(setChangeMode())}
+              className="btn w-full rounded-3xl bg-accent hover:bg-accent"
+            >
+              Сохранить изменения
+            </button>
+          )}
+        </div>
+      </div>
       {selectedDates.length > 0 ? <h1>selectedDates[0]</h1> : null}
       <div className="m-3 flex justify-between">
         <div className="flex">
@@ -104,13 +180,136 @@ export const CustomCalendar = () => {
               <tr className="h-32" key={i}>
                 {row.map((dpDay) => (
                   <td
-                    className="border-slate-300 border"
-                    key={dpDay.$date.toDateString()}
+                    className="border-slate-300 h-24 w-1/12 border p-1"
+                    key={dpDay.day}
                   >
-                    <div className="flex h-24 justify-end">
-                      <button className="flex align-top" {...dayButton(dpDay)}>
-                        {dpDay.day}
-                      </button>
+                    <div className="flex h-full flex-col justify-between">
+                      <div className="flex justify-end">
+                        <span className={dateNumberClass(dpDay.inCurrentMonth)}>
+                          {dpDay.day}
+                        </span>
+                      </div>
+
+                      {dpDay.lessons.changing === false ? (
+                        <div className="flex flex-col">
+                          {changeMode === true ? (
+                            <div className="flex justify-between text-gray-500">
+                              <button
+                                onClick={() =>
+                                  dispatch(setChangingLesson(dpDay.lessons))
+                                }
+                              >
+                                <PencilLine />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  dispatch(
+                                    setSecondTime({
+                                      time: "-",
+                                      i: dpDay.lessons.i,
+                                    }),
+                                  ),
+                                    dispatch(
+                                      setFirstTime({
+                                        time: "-",
+                                        i: dpDay.lessons.i,
+                                      }),
+                                    );
+                                }}
+                              >
+                                <CircleX />
+                              </button>
+                            </div>
+                          ) : null}
+
+                          <div className="mb-1 text-nowrap rounded-sm border-2 border-accent pl-1 pr-1">
+                            <p className="text-xs font-light">
+                              {dpDay.lessons.firstTime}
+                            </p>
+                            <p className="text-xs font-light">
+                              {dpDay.lessons.firstTitle}
+                            </p>
+                          </div>
+                          <div className="rounded-sm border-2 border-accent pl-1 pr-1">
+                            <p className="text-xs font-light">
+                              {dpDay.lessons.secondTime}
+                            </p>
+                            <p className="text-xs font-light">
+                              {dpDay.lessons.secondTitle}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col">
+                          {changeMode === true ? (
+                            <div className="flex justify-between text-gray-500">
+                              <button
+                                onClick={() =>
+                                  dispatch(setChangingLesson(dpDay.lessons))
+                                }
+                              >
+                                <PencilLine />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  dispatch(
+                                    setSecondTime({
+                                      time: "-",
+                                      i: dpDay.lessons.i,
+                                    }),
+                                  ),
+                                    dispatch(
+                                      setFirstTime({
+                                        time: "-",
+                                        i: dpDay.lessons.i,
+                                      }),
+                                    );
+                                }}
+                              >
+                                <CircleX />
+                              </button>
+                            </div>
+                          ) : null}
+                          <div className="mb-1 text-nowrap rounded-sm border-2 border-accent pl-1 pr-1">
+                            <input
+                              onChange={(e) =>
+                                dispatch(
+                                  setFirstTime({
+                                    time: e.target.value,
+                                    i: dpDay.lessons.i,
+                                  }),
+                                )
+                              }
+                              value={dpDay.lessons.firstTime}
+                              type="text"
+                              placeholder="Type here"
+                              className="input input-xs input-bordered w-full max-w-xs"
+                            />
+                            <p className="text-xs font-light">
+                              {dpDay.lessons.firstTitle}
+                            </p>
+                          </div>
+                          <div className="rounded-sm border-2 border-accent pl-1 pr-1">
+                            <input
+                              onChange={(e) =>
+                                dispatch(
+                                  setSecondTime({
+                                    time: e.target.value,
+                                    i: dpDay.lessons.i,
+                                  }),
+                                )
+                              }
+                              value={dpDay.lessons.secondTime}
+                              type="text"
+                              placeholder="Type here"
+                              className="input input-xs input-bordered w-full max-w-xs"
+                            />
+                            <p className="text-xs font-light">
+                              {dpDay.lessons.secondTitle}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </td>
                 ))}
