@@ -17,17 +17,43 @@ export const CustomCalendar = () => {
     offsetDate,
     onOffsetChange,
     dates: { toggle: true },
-    calendar: { startDay: 1 },
+    calendar: { startDay: 1, offsets: [-1], mode: "fluid" },
   });
 
   const { year, month, days } = calendars[0];
 
   const onMoveToNow = () => onOffsetChange(new Date());
 
-  const onMoveToNewYear = () => {
-    const currentYear = new Date().getFullYear();
-    onOffsetChange(new Date(currentYear + 1, 0, 1));
-  };
+  // const onMoveToNewYear = () => {
+  //   const currentYear = new Date().getFullYear();
+  //   onOffsetChange(new Date(currentYear + 1, 0, 1));
+  // };
+
+  // const currentMonthDays = days.filter((dpday) => {
+  //   if (dpday.inCurrentMonth === true) {
+  //     return dpday;
+  //   }
+  // });
+
+  // const previousMonthDays = days1.filter((dpday) => {
+  //   if (dpday.inCurrentMonth === true) {
+  //     return dpday;
+  //   }
+  // });
+
+  // const formattedDays = [...currentMonthDays];
+
+  // const additionalDays = 35 - currentMonthDays.length;
+
+  // for (let i = 0; i < additionalDays; i += 1) {
+  //   formattedDays.unshift(previousMonthDays[previousMonthDays.length - 1 - i]);
+  // }
+
+  // console.log(currentMonthDays);
+
+  // console.log(previousMonthDays);
+
+  // console.log(formattedDays);
 
   const size = 7; //размер подмассива
   const mainTable = []; //массив в который будет выведен результат.
@@ -37,30 +63,31 @@ export const CustomCalendar = () => {
 
   return (
     <section>
-      <div>
-        <button className="btn" onClick={onMoveToNow}>
-          Show today
-        </button>
-        <button className="btn" onClick={onMoveToNewYear}>
-          Show the next New Year
-        </button>
-      </div>
-
       {selectedDates.length > 0 ? <h1>selectedDates[0]</h1> : null}
       <div className="m-3 flex justify-between">
-        <div className="flex align-middle">
+        <div className="flex">
           <button
             {...subtractOffset({ months: 1 })}
             aria-label="Previous month"
           >
             <MoveLeft />
           </button>
-          <span>
-            {month} {year}
-          </span>
+          <div className="flex h-14 w-36 items-center justify-center text-center">
+            <span>
+              {month} {year}
+            </span>
+          </div>
           <button {...addOffset({ months: 1 })} aria-label="Next month">
             <MoveRight />
           </button>
+          <div>
+            <button
+              className="btn btn-outline ml-5 rounded-3xl border-primary hover:border-primary hover:bg-primary"
+              onClick={onMoveToNow}
+            >
+              Сегодня
+            </button>
+          </div>
         </div>
       </div>
       <table className="table w-full border-collapse">
